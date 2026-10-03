@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CYP Inhibition · Biology, Assay & Data Pipeline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+:root{
+ --bg:#0a1420;--bg2:#0c1a29;--panel:#0f2234;--panel2:#12283d;--line:#1e3a52;
+ --txt:#c9d5e3;--mut:#7e93a8;--dim:#5c7189;
+ --teal:#2dd4bf;--amber:#f5a524;--coral:#fb7185;--green:#34d399;--sky:#38bdf8;--violet:#a78bfa;
+ --mono:'JetBrains Mono',ui-monospace,monospace;--disp:'Space Grotesk',system-ui,sans-serif;--body:'Inter',system-ui,sans-serif;}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--body);line-height:1.62;font-size:16px;
+ background-image:radial-gradient(1100px 560px at 82% -8%,rgba(45,212,191,.06),transparent),radial-gradient(900px 480px at -5% 8%,rgba(56,189,248,.05),transparent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+a{color:var(--teal);text-decoration:none}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.01em;color:#e6eef7;line-height:1.16}
+.mono{font-family:var(--mono)}
+
+.hero{border-bottom:1px solid var(--line);padding:52px 0 38px}
+.kicker{font-family:var(--mono);font-size:12.5px;color:var(--teal);letter-spacing:.14em;display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal)}
+.hero h1{font-size:clamp(29px,4.3vw,48px);font-weight:700;margin:.08em 0 .32em}
+.hero p.lede{font-size:18px;color:var(--mut);max-width:72ch;margin:0}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:30px}
+.st{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+.st .v{font-family:var(--mono);font-size:22px;font-weight:700;color:#eaf3fb}
+.st .l{font-size:11.5px;color:var(--mut);margin-top:6px}
+
+.nav{position:sticky;top:0;z-index:20;background:rgba(10,20,32,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;gap:6px;flex-wrap:wrap;padding:11px 24px}
+.nav a{font-family:var(--mono);font-size:12.5px;color:var(--mut);padding:5px 11px;border-radius:6px;border:1px solid transparent}
+.nav a:hover{color:var(--txt);border-color:var(--line);background:var(--panel)}
+
+section{padding:50px 0;border-bottom:1px solid var(--line)}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-n{font-family:var(--mono);font-size:13px;color:var(--teal);border:1px solid var(--line);border-radius:6px;padding:2px 9px}
+h2{font-size:clamp(22px,3vw,31px);margin:0}
+.sub{color:var(--mut);max-width:80ch;margin:10px 0 26px;font-size:16.5px}
+p{margin:0 0 15px}
+.lead-in{color:var(--txt)}
+b{color:#e6eef7;font-weight:600}
+.term{color:var(--teal);font-weight:600}
+
+/* isoform cards */
+.iso{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+.ic{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px;border-top:3px solid var(--line)}
+.ic.a3{border-top-color:var(--teal)}.ic.a2c{border-top-color:var(--violet)}.ic.a2d{border-top-color:var(--amber)}.ic.a1{border-top-color:var(--sky)}
+.ic h4{font-family:var(--mono);font-size:15px;margin:0 0 4px}
+.ic .r{font-size:12.5px;color:var(--mut);margin:0 0 10px}
+.ic .d{font-size:13.5px;margin:0}
+.ic .assay{font-family:var(--mono);font-size:10.5px;margin-top:11px;padding-top:9px;border-top:1px solid var(--line);color:var(--dim)}
+
+/* two-up */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;margin:8px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h3{font-size:18px;margin:0 0 10px}
+.card.rev{border-left:3px solid var(--sky)}
+.card.tdi{border-left:3px solid var(--coral)}
+figure{margin:24px 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 18px 12px}
+figcaption{font-size:13.5px;color:var(--mut);padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
+
+/* callout */
+.note{background:linear-gradient(180deg,rgba(245,165,36,.06),transparent);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;padding:15px 18px;margin:18px 0;font-size:14.5px}
+.note.teal{border-left-color:var(--teal);background:linear-gradient(180deg,rgba(45,212,191,.06),transparent)}
+
+/* ===== FLOW DIAGRAM ===== */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 26px;font-family:var(--mono);font-size:11.5px;color:var(--mut)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.band{position:relative}
+.band-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--dim);margin-bottom:10px}
+.nodes{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.node{flex:1 1 0;min-width:180px;background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:12px;padding:15px 16px;position:relative}
+.node .nt{font-family:var(--disp);font-weight:600;font-size:15px;color:#e8f1fa;margin-bottom:4px}
+.node .nd{font-size:13px;color:var(--mut);line-height:1.5}
+.node .nm{font-family:var(--mono);font-size:11px;margin-top:10px;color:var(--teal);display:inline-block;border:1px solid var(--line);border-radius:14px;padding:2px 9px}
+.node.proc{border-top:3px solid var(--teal)}
+.node.data{border-top:3px solid var(--amber)} .node.data .nm{color:var(--amber)}
+.node.end{border-top:3px solid var(--coral)} .node.end .nm{color:var(--coral)}
+.node.app{border-top:3px solid var(--violet);min-width:150px} .node.app .nm{color:var(--violet)}
+.node.input{border-top:3px solid var(--sky)} .node.input .nm{color:var(--sky)}
+.arrow{height:30px;display:flex;align-items:center;justify-content:center;color:var(--line)}
+.arrow svg{width:16px;height:30px}
+.band-tag{position:absolute;left:-2px;top:0;font-family:var(--mono);font-size:10px;color:var(--dim)}
+.wide{flex-basis:100%}
+.subnote{font-size:12px;color:var(--dim);text-align:center;margin:8px 0 0;font-family:var(--mono)}
+
+/* meaning table */
+table{width:100%;border-collapse:collapse;margin:22px 0;font-size:14px}
+th,td{text-align:left;padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.03em;font-weight:500}
+td .mono{color:var(--amber)}
+tr:hover td{background:rgba(255,255,255,.015)}
+.use{color:var(--teal)}
+
+/* endpoint cards */
+.ends{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:6px}
+.end-c{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:12px;padding:18px;border-top:3px solid var(--coral)}
+.end-c .trk{font-family:var(--mono);font-size:10.5px;color:var(--coral);letter-spacing:.08em}
+.end-c h4{font-size:17px;margin:7px 0 8px}
+.end-c p{font-size:13.5px;color:var(--mut);margin:0 0 10px}
+.end-c .metric{font-family:var(--mono);font-size:11.5px;color:var(--txt);border-top:1px solid var(--line);padding-top:9px}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:20px}
+.app-c{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--violet);border-radius:10px;padding:14px 15px}
+.app-c h4{font-size:14.5px;margin:0 0 5px;font-family:var(--disp)}
+.app-c p{font-size:12.5px;color:var(--mut);margin:0}
+
+footer{padding:34px 0 60px;color:var(--dim);font-size:13px}
+@media(max-width:820px){.strip{grid-template-columns:repeat(2,1fr)}.iso{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.ends{grid-template-columns:1fr}.apps{grid-template-columns:1fr 1fr}.node{min-width:140px}}
+</style></head><body>
+
+<header class="hero"><div class="wrap">
+ <div class="kicker"><span class="dot"></span>OPENADMET CYP CHALLENGE · BIOLOGY · ASSAY · DATA PIPELINE</div>
+ <h1>From heme chemistry to a prediction benchmark.</h1>
+ <p class="lede">What the enzymes do, how the experiments turn that biology into numbers, what each dataset actually measures, and where every data stream lands — the three challenge tracks and the applications beyond them.</p>
+ <div class="strip">
+  <div class="st"><div class="v">4 isoforms</div><div class="l">3A4 · 2C9 · 2D6 · 1A2</div></div>
+  <div class="st"><div class="v">2 assay arms</div><div class="l">&#8722;NADPH direct · +NADPH TDI</div></div>
+  <div class="st"><div class="v">17,504</div><div class="l">primary-screen measurements</div></div>
+  <div class="st"><div class="v">750</div><div class="l">dense blinded test compounds</div></div>
+ </div>
+</div></header>
+
+<nav class="nav"><div class="wrap">
+ <a href="#bio">01 · Biology</a><a href="#method">02 · Data generation</a><a href="#flow">03 · The pipeline</a>
+ <a href="#meaning">04 · What each stream means</a><a href="#ends">05 · Endpoints &amp; applications</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- 01 BIOLOGY -->
+<section id="bio">
+ <div class="sec-h"><span class="sec-n">01</span><h2>The biology: heme, electrons, and two ways to jam the machine</h2></div>
+ <p class="sub">Cytochrome P450s are heme-containing monooxygenases — the Phase-I machinery that oxidises most marketed small-molecule drugs. Predicting their inhibition is a core ADMET and regulatory requirement because a drug that blocks a CYP changes the exposure of everything else that CYP clears.</p>
+
+ <p class="lead-in">Each catalytic turnover needs <b>electrons delivered from NADPH</b> via cytochrome-P450 reductase to activate molecular oxygen at the heme iron and oxidise the bound substrate. That single dependency is the lever the whole assay design pulls: <b>remove NADPH and the enzyme can bind a compound but cannot metabolise it; add NADPH and turnover proceeds.</b> Everything about the two-arm experiment below follows from this.</p>
+
+ <div class="iso">
+  <div class="ic a3"><h4>CYP3A4</h4><p class="r">The workhorse</p><p class="d">Largest, most flexible pocket; clears the widest chemical matter. The isoform industry screens for TDI by default.</p><p class="assay">fluorescence · probe DBOMF</p></div>
+  <div class="ic a2c"><h4>CYP2C9</h4><p class="r">Acidic drugs</p><p class="d">Major route for acidic compounds, with many narrow-therapeutic-index substrates where small shifts matter.</p><p class="assay">fluorescence · probe EOMCC</p></div>
+  <div class="ic a2d"><h4>CYP2D6</h4><p class="r">Polymorphic</p><p class="d">Highly polymorphic, partners with basic compounds. Fluorogenic probes failed here — measured by mass-spec instead.</p><p class="assay">Echo-MS · dextromethorphan depletion</p></div>
+  <div class="ic a1"><h4>CYP1A2</h4><p class="r">Planar systems</p><p class="d">Rounds out the panel; characteristic of planar and polyaromatic compound metabolism.</p><p class="assay">fluorescence · probe EOMCC</p></div>
+ </div>
+
+ <div class="two">
+  <div class="card rev"><h3>Direct (reversible) inhibition</h3><p>The parent compound binds the enzyme and competes with substrate. No metabolism is required, so it shows up <b>with or without NADPH</b> — the inhibition potency (IC50) is the same in both arms. This is the classic, immediately-reversible liability.</p><p style="margin:0;color:var(--mut);font-size:14px">Measured in the <span class="term">&#8722;NADPH</span> arm as a clean readout of parent binding.</p></div>
+  <div class="card tdi"><h3>Time-dependent inhibition (TDI)</h3><p>A mechanism-based ("suicide") process: the enzyme metabolises the compound into a <b>reactive species</b> that disables it — reversibly, quasi-irreversibly, or by covalent adduction of the heme or apoprotein. Because it needs turnover, it only appears <b>with NADPH</b>, and it drives drug–drug interactions that persist after the parent has cleared.</p><p style="margin:0;color:var(--mut);font-size:14px">Detected as a <span class="term">left-shift in IC50</span> between the two arms.</p></div>
+ </div>
+
+ <figure><svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:640px"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f5a524"/></marker></defs><text x="46" y="14" fill="#5c7189" font-size="9" font-family="JetBrains Mono,monospace">% enzyme activity</text><line x1="56" y1="34" x2="56" y2="190" stroke="#1e3a52" stroke-width="1"/><line x1="56" y1="190" x2="294" y2="190" stroke="#1e3a52" stroke-width="1"/><line x1="56" y1="190.0" x2="294" y2="190.0" stroke="#13273b" stroke-width="1"/><text x="50" y="193.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">0</text><line x1="56" y1="112.0" x2="294" y2="112.0" stroke="#13273b" stroke-width="1"/><text x="50" y="115.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">50</text><line x1="56" y1="34.0" x2="294" y2="34.0" stroke="#13273b" stroke-width="1"/><text x="50" y="37.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">100</text><polyline points="56.0,34.0 60.0,34.0 64.1,34.0 68.1,34.0 72.1,34.0 76.2,34.1 80.2,34.1 84.2,34.1 88.3,34.1 92.3,34.1 96.3,34.2 100.4,34.2 104.4,34.3 108.4,34.4 112.5,34.5 116.5,34.6 120.5,34.8 124.6,35.0 128.6,35.2 132.6,35.6 136.7,36.0 140.7,36.6 144.7,37.3 148.8,38.1 152.8,39.3 156.8,40.6 160.9,42.4 164.9,44.5 168.9,47.2 173.0,50.5 177.0,54.4 181.1,59.2 185.1,64.7 189.1,71.2 193.2,78.5 197.2,86.7 201.2,95.5 205.3,104.8 209.3,114.3 213.3,123.7 217.4,132.8 221.4,141.3 225.4,149.1 229.5,156.0 233.5,162.1 237.5,167.2 241.6,171.6 245.6,175.2 249.6,178.1 253.7,180.6 257.7,182.5 261.7,184.1 265.8,185.3 269.8,186.3 273.8,187.1 277.9,187.7 281.9,188.2 285.9,188.6 290.0,188.9 294.0,189.1" fill="none" stroke="#2dd4bf" stroke-width="2.4"/><polyline points="56.0,34.0 60.0,34.0 64.1,34.0 68.1,34.0 72.1,34.0 76.2,34.1 80.2,34.1 84.2,34.1 88.3,34.1 92.3,34.1 96.3,34.2 100.4,34.2 104.4,34.3 108.4,34.4 112.5,34.5 116.5,34.6 120.5,34.8 124.6,35.0 128.6,35.2 132.6,35.6 136.7,36.0 140.7,36.6 144.7,37.3 148.8,38.1 152.8,39.3 156.8,40.6 160.9,42.4 164.9,44.5 168.9,47.2 173.0,50.5 177.0,54.4 181.1,59.2 185.1,64.7 189.1,71.2 193.2,78.5 197.2,86.7 201.2,95.5 205.3,104.8 209.3,114.3 213.3,123.7 217.4,132.8 221.4,141.3 225.4,149.1 229.5,156.0 233.5,162.1 237.5,167.2 241.6,171.6 245.6,175.2 249.6,178.1 253.7,180.6 257.7,182.5 261.7,184.1 265.8,185.3 269.8,186.3 273.8,187.1 277.9,187.7 281.9,188.2 285.9,188.6 290.0,188.9 294.0,189.1" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-dasharray="5 4"/><text x="175.0" y="216.0" fill="#7e93a8" font-size="9.5" text-anchor="middle" font-family="JetBrains Mono,monospace">log [inhibitor]  &#8594;</text><text x="175.0" y="20.0" fill="#c9d5e3" font-size="12" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="600">Reversible inhibitor</text><line x1="376" y1="34" x2="376" y2="190" stroke="#1e3a52" stroke-width="1"/><line x1="376" y1="190" x2="614" y2="190" stroke="#1e3a52" stroke-width="1"/><line x1="376" y1="190.0" x2="614" y2="190.0" stroke="#13273b" stroke-width="1"/><text x="370" y="193.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">0</text><line x1="376" y1="112.0" x2="614" y2="112.0" stroke="#13273b" stroke-width="1"/><text x="370" y="115.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">50</text><line x1="376" y1="34.0" x2="614" y2="34.0" stroke="#13273b" stroke-width="1"/><text x="370" y="37.0" fill="#5c7189" font-size="9" text-anchor="end" font-family="JetBrains Mono,monospace">100</text><polyline points="376.0,34.0 380.0,34.0 384.1,34.0 388.1,34.0 392.1,34.0 396.2,34.1 400.2,34.1 404.2,34.1 408.3,34.1 412.3,34.1 416.3,34.2 420.4,34.2 424.4,34.3 428.4,34.4 432.5,34.5 436.5,34.6 440.5,34.8 444.6,35.0 448.6,35.2 452.6,35.6 456.7,36.0 460.7,36.6 464.7,37.3 468.8,38.1 472.8,39.3 476.8,40.6 480.9,42.4 484.9,44.5 488.9,47.2 493.0,50.5 497.0,54.4 501.1,59.2 505.1,64.7 509.1,71.2 513.2,78.5 517.2,86.7 521.2,95.5 525.3,104.8 529.3,114.3 533.3,123.7 537.4,132.8 541.4,141.3 545.4,149.1 549.5,156.0 553.5,162.1 557.5,167.2 561.6,171.6 565.6,175.2 569.6,178.1 573.7,180.6 577.7,182.5 581.7,184.1 585.8,185.3 589.8,186.3 593.8,187.1 597.9,187.7 601.9,188.2 605.9,188.6 610.0,188.9 614.0,189.1" fill="none" stroke="#38bdf8" stroke-width="2.4" stroke-dasharray="5 4"/><polyline points="376.0,34.1 380.0,34.2 384.1,34.2 388.1,34.3 392.1,34.4 396.2,34.5 400.2,34.6 404.2,34.7 408.3,34.9 412.3,35.2 416.3,35.5 420.4,36.0 424.4,36.5 428.4,37.2 432.5,38.0 436.5,39.1 440.5,40.4 444.6,42.1 448.6,44.2 452.6,46.8 456.7,49.9 460.7,53.8 464.7,58.4 468.8,63.8 472.8,70.2 476.8,77.4 480.9,85.4 484.9,94.2 488.9,103.4 493.0,112.9 497.0,122.3 501.1,131.5 505.1,140.1 509.1,148.0 513.2,155.0 517.2,161.2 521.2,166.5 525.3,171.0 529.3,174.7 533.3,177.7 537.4,180.2 541.4,182.2 545.4,183.8 549.5,185.1 553.5,186.2 557.5,187.0 561.6,187.6 565.6,188.1 569.6,188.5 573.7,188.8 577.7,189.1 581.7,189.3 585.8,189.4 589.8,189.6 593.8,189.7 597.9,189.7 601.9,189.8 605.9,189.8 610.0,189.9 614.0,189.9" fill="none" stroke="#fb7185" stroke-width="2.4"/><line x1="528.3" y1="112.0" x2="492.6" y2="112.0" stroke="#f5a524" stroke-width="1.4" marker-end="url(#ah)"/><text x="510.5" y="105.0" fill="#f5a524" font-size="10" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700">left-shift = TDI</text><text x="495.0" y="216.0" fill="#7e93a8" font-size="9.5" text-anchor="middle" font-family="JetBrains Mono,monospace">log [inhibitor]  &#8594;</text><text x="495.0" y="20.0" fill="#c9d5e3" font-size="12" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="600">Time-dependent inhibitor</text><text x="10" y="248" fill="#5c7189" font-size="9.5" font-family="JetBrains Mono,monospace">—— +NADPH (TDI arm)   - - -  −NADPH (direct arm)</text></svg><figcaption><b>The IC50-shift principle.</b> A purely reversible inhibitor gives superimposable curves in both arms. A time-dependent inhibitor is converted during the +NADPH pre-incubation into a more potent (often irreversible) species, so its curve shifts left to a lower IC50 — and the size of that shift <i>is</i> the TDI signal. A shift beyond 2-fold (0.301 log units) is the challenge's positive threshold.</figcaption></figure>
+
+ <div class="note">Why it matters clinically: CYP inhibition slows clearance of co-administered drugs, pushing their plasma levels up — the most common and significant CYP-mediated liability (<b>DDIs</b>), dangerous when the co-medication has a <b>narrow therapeutic index</b>, and uniquely persistent when the inhibition is <b>mechanism-based</b>. Evaluating it is a core FDA expectation, and good <i>in-silico</i> prediction supports the agency's New Approach Methodologies push to cut animal testing.</div>
+</section>
+
+<!-- 02 METHOD -->
+<section id="method">
+ <div class="sec-h"><span class="sec-n">02</span><h2>How the data was generated</h2></div>
+ <p class="sub">A two-tier screen — cheap breadth first, expensive precision second — followed by analogue hit-expansion to build a dense, blinded test set. Three isoforms are read by fluorescence; CYP2D6 by mass-spec.</p>
+
+ <p><b>Tier 1 — primary single-concentration screen.</b> Two libraries (Enamine <span class="mono">DDS10</span> diversity set + <span class="mono">FDAA</span> FDA-approved compounds) are screened at a single concentration (~49.5 µM), deliberately run in the <span class="term">+NADPH (TDI) condition</span> to catch as many actives as possible. Hits are called with a proper statistical pipeline — variance-stabilising transform, spatial-artifact correction, a per-plate linear model contrasting each compound against the negative control, and Benjamini–Hochberg FDR control — then thresholded on log-fold-change and FDR. A negative log-fold-change means inhibition.</p>
+
+ <p><b>Tier 2 — dose-response confirmation.</b> Each hit gets a 12-point dose-response curve fit with a <b>Bayesian</b> procedure that yields not just a pIC50 point estimate but a <b>95% credible interval</b> — the honest width of the measurement. Both arms (&#8722;NADPH and +NADPH) are collected by default, targeting ~1,500 DRCs per isoform, so a TDI shift can be derived for every compound.</p>
+
+ <p><b>Hit expansion → the test set.</b> The top 25 hits for <b>three</b> isoforms (CYP3A4, CYP1A2, CYP2C9 — 2D6 was still in development) were each expanded into their 10 nearest Tanimoto analogues from Enamine's in-stock catalogue, giving <b>750 compounds</b> that were then assayed densely against <b>all four</b> isoforms. This is why the training matrix is sparse while the test matrix is dense — and why CYP2D6 is the hard isoform: its test compounds are low-potency analogues selected for <i>other</i> enzymes' hits.</p>
+
+ <div class="note teal"><b>The two readout technologies.</b> CYP3A4/2C9/1A2 use <b>fluorescence</b>: masked "Vivid-style" probes that CYPs metabolise into a fluorescent product, scaled to 1536-well biochemical (recombinant-enzyme, not cell-based) format. CYP2D6's fluorogenic probes gave poor signal, so it was moved to <b>label-free acoustic-ejection mass spec</b> (Echo-MS / AEMS): ~2.5 nL droplets fired into an open-port interface feeding a SCIEX ZenoTOF 7600, tracking depletion of the standard 2D6 substrate dextromethorphan. Same enzyme and NADPH format — but a different noise model, which is one reason 2D6 behaves differently downstream.</div>
+</section>
+
+<!-- 03 FLOW -->
+<section id="flow">
+ <div class="sec-h"><span class="sec-n">03</span><h2>The pipeline, end to end</h2></div>
+ <p class="sub">From compound libraries to the three challenge endpoints and the applications they feed. Follow the arrows down.</p>
+ <div class="legend">
+  <span><i style="background:var(--sky)"></i>input</span>
+  <span><i style="background:var(--teal)"></i>experimental process</span>
+  <span><i style="background:var(--amber)"></i>data artifact (a released file)</span>
+  <span><i style="background:var(--coral)"></i>challenge endpoint</span>
+  <span><i style="background:var(--violet)"></i>application</span>
+ </div>
+
+ <div class="flow">
+  <div class="band"><div class="band-lbl">INPUT · COMPOUND LIBRARIES</div>
+   <div class="nodes">
+    <div class="node input"><div class="nt">Enamine DDS10</div><div class="nd">Diversity set — broad chemical space to survey inhibition liabilities.</div></div>
+    <div class="node input"><div class="nt">FDAA</div><div class="nd">FDA-approved compounds — known drugs, anchored to clinical reality.</div></div>
+   </div></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">TIER 1 · PRIMARY SCREEN &nbsp;(+NADPH / TDI condition, ~49.5 µM)</div>
+   <div class="nodes">
+    <div class="node proc"><div class="nt">Fluorescence panel</div><div class="nd">Masked probes &#8594; fluorescent product, 1536-well biochemical. Reads CYP3A4, 2C9, 1A2.</div></div>
+    <div class="node proc"><div class="nt">Echo-MS (AEMS)</div><div class="nd">Acoustic-ejection mass-spec, dextromethorphan depletion. Reads CYP2D6.</div></div>
+    <div class="node data"><div class="nt">Single-concentration data</div><div class="nd">log2 fold-change, FDR, Cohen's d.</div><span class="nm">17,504 rows · 4,376 cpds</span></div>
+   </div></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">HIT SELECTION · STATISTICAL</div>
+   <div class="nodes"><div class="node proc wide"><div class="nt">VST &#8594; spatial-artifact correction &#8594; per-plate linear model vs control &#8594; BH-FDR &#8594; logFC + FDR cut</div><div class="nd">Turns noisy plate data into a defensible active/inactive call; negative log-fold-change = inhibition.</div></div></div></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">TIER 2 · DOSE-RESPONSE CONFIRMATION &nbsp;(12-point, both arms, Bayesian fit)</div>
+   <div class="nodes">
+    <div class="node data"><div class="nt">Direct pIC50 + 95% CI</div><div class="nd">&#8722;NADPH arm: reversible potency, with its measurement uncertainty.</div><span class="nm">file: inhibition</span></div>
+    <div class="node data"><div class="nt">TDI-arm pIC50 &amp; shift</div><div class="nd">+NADPH arm vs direct &#8594; is_TDI label (3A4, 2D6).</div><span class="nm">file: TDI</span></div>
+    <div class="node data"><div class="nt">Emax (both arms)</div><div class="nd">Maximal effect — efficacy axis, orthogonal to potency.</div><span class="nm">file: Emax</span></div>
+   </div>
+   <p class="subnote">~1,500 DRCs per isoform · sparse across the four targets</p></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">HIT EXPANSION &#8594; TEST SET</div>
+   <div class="nodes"><div class="node proc wide"><div class="nt">Top 25 hits &#215; {CYP3A4, 1A2, 2C9} &#8594; +10 Tanimoto analogues each &#8594; assayed dense &#215; all 4 CYPs</div><div class="nd">Series-structured, blinded, SMILES-only. 2D6 rides along &#8594; its test compounds are low-potency, hence the distribution shift.</div><span class="nm">750 compounds · file: TEST-BLINDED</span></div></div></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">ENDPOINTS · CHALLENGE TRACKS</div>
+   <div class="nodes">
+    <div class="node end"><div class="nt">Direct inhibition</div><div class="nd">Regression: pIC50 for all 4 isoforms.</div><span class="nm">MA-ST-RAE</span></div>
+    <div class="node end"><div class="nt">Time-dependent inhibition</div><div class="nd">Classification, CYP3A4 &amp; 2D6 only.</div><span class="nm">MCC</span></div>
+    <div class="node end"><div class="nt">Structure track</div><div class="nd">Predict the 3D CYP3A4&#8211;ligand pose from SMILES (20 cryo-EM complexes).</div><span class="nm">LDDT-PLI + PoseBusters</span></div>
+   </div></div>
+  <div class="arrow"><svg viewBox="0 0 16 30"><line x1="8" y1="0" x2="8" y2="22" stroke="#2a4a66" stroke-width="2"/><path d="M3,20 L8,29 L13,20 Z" fill="#2a4a66"/></svg></div>
+  <div class="band"><div class="band-lbl">APPLICATIONS · BEYOND THE LEADERBOARD</div>
+   <div class="nodes">
+    <div class="node app"><div class="nt">DDI risk</div><div class="nd">Flag co-administration liabilities early.</div></div>
+    <div class="node app"><div class="nt">MBI / reactive-metabolite alerts</div><div class="nd">Design out mechanism-based inactivation.</div></div>
+    <div class="node app"><div class="nt">Cross-CYP selectivity map</div><div class="nd">Promiscuity vs clean-profile triage.</div></div>
+    <div class="node app"><div class="nt">SAR / matched pairs</div><div class="nd">Learn the series &#8594; activity rules.</div></div>
+    <div class="node app"><div class="nt">Calibrated ADMET scoring</div><div class="nd">Uncertainty-aware liability gates.</div></div>
+    <div class="node app"><div class="nt">Structure-informed mechanism</div><div class="nd">Pose &#8594; rationalise observed SAR.</div></div>
+   </div></div>
+ </div>
+</section>
+
+<!-- 04 MEANING -->
+<section id="meaning">
+ <div class="sec-h"><span class="sec-n">04</span><h2>What each data stream actually measures — and is good for</h2></div>
+ <p class="sub">The same compound is seen through several lenses. Each released file is one lens, with its own biological meaning and its own best modelling use.</p>
+ <table>
+  <thead><tr><th>Stream</th><th>Biological meaning</th><th>Precision / caveat</th><th>Best use</th></tr></thead>
+  <tbody>
+   <tr><td class="mono">single-concentration</td><td>One-shot "does it inhibit at 49.5 µM" across the whole library, run in the TDI condition</td><td>Cheap, broad, noisier; a screening call, not a potency</td><td class="use">Pretraining / auxiliary signal — tracks DRC potency at |&rho;| up to 0.94 across 4,376 compounds</td></tr>
+   <tr><td class="mono">inhibition (direct)</td><td>Reversible binding potency of the parent, per isoform</td><td>The 95% CI <b>widens ~10&#215; at low activity</b> — that uncertainty is real, not noise to fit</td><td class="use">The regression target; CI bounds enable training and scoring against true ST-RAE</td></tr>
+   <tr><td class="mono">TDI (both arms)</td><td>The metabolism-driven shift — mechanism-based inactivation signal</td><td>Boolean label is derived from two continuous arms via the 4 / 4.301 rules</td><td class="use">Model the shift as regression, then threshold for MCC; feeds MBI liability flagging</td></tr>
+   <tr><td class="mono">Emax</td><td>Maximal achievable effect — <i>efficacy</i>, distinct from potency; partial vs complete inhibitors</td><td>is_TDI provided for all four isoforms here (incl. 1A2/2C9)</td><td class="use">Extra supervision + an orthogonal axis; separates "weak but complete" from "potent but partial"</td></tr>
+   <tr><td class="mono">TEST-BLINDED</td><td>Dense 4-isoform readout on analogue series (hit + 10)</td><td>SMILES only; series structure &#8594; CV must be series-aware</td><td class="use">The evaluation target; its series structure dictates grouped validation</td></tr>
+   <tr><td class="mono">cryo-EM structures</td><td>Where and how ligands actually sit in the flexible 3A4 pocket</td><td>20 complexes; same ligand can adopt distinct poses</td><td class="use">Structure track; also a mechanistic lens on inhibition SAR</td></tr>
+  </tbody>
+ </table>
+</section>
+
+<!-- 05 ENDS -->
+<section id="ends">
+ <div class="sec-h"><span class="sec-n">05</span><h2>Endpoints and applications</h2></div>
+ <p class="sub">Three scored tracks, then the uses the same models serve once the leaderboard closes.</p>
+ <div class="ends">
+  <div class="end-c"><div class="trk">TRACK · REGRESSION</div><h4>Direct inhibition</h4><p>Predict direct-arm pIC50 for CYP3A4, 2C9, 2D6, 1A2 across the 750 test compounds — four targets each. Low-activity compounds are down-weighted.</p><div class="metric">metric · MA-ST-RAE (interval-aware)</div></div>
+  <div class="end-c"><div class="trk">TRACK · CLASSIFICATION</div><h4>Time-dependent inhibition</h4><p>Classify significant TDI (&gt;2-fold shift) for CYP3A4 and CYP2D6 — the isoforms where mechanism-based inactivation is clinically prominent and shifts actually concentrate.</p><div class="metric">metric · Matthews correlation (MCC)</div></div>
+  <div class="end-c"><div class="trk">TRACK · STRUCTURE</div><h4>3D pose prediction</h4><p>Given only SMILES, predict the CYP3A4–ligand complex for 20 cryo-EM structures. Physical plausibility is gated, not just atom placement.</p><div class="metric">metric · LDDT-PLI + BiSyRMSD · PoseBusters gate</div></div>
+ </div>
+
+ <h3 style="margin:30px 0 4px;font-size:18px">And what the same work unlocks beyond the challenge</h3>
+ <div class="apps">
+  <div class="app-c"><h4>DDI risk triage</h4><p>Turn per-isoform inhibition into early co-administration flags, reducing late-stage clinical DDI studies.</p></div>
+  <div class="app-c"><h4>MBI liability design-out</h4><p>Reactive-metabolite structural alerts (alkyne&#8594;3A4, furan&#8594;2D6) steer chemists away from mechanism-based inactivation.</p></div>
+  <div class="app-c"><h4>Cross-CYP selectivity</h4><p>Map promiscuous vs clean scaffolds across the panel — an organiser research focus too.</p></div>
+  <div class="app-c"><h4>Series SAR / matched pairs</h4><p>The analogue structure of the test set is a ready-made matched-molecular-pair dataset.</p></div>
+  <div class="app-c"><h4>Calibrated liability gates</h4><p>Interval-native predictions give uncertainty-aware thresholds reusable across an ADMET stack.</p></div>
+  <div class="app-c"><h4>Structure-informed inhibition</h4><p>Poses rationalise SAR and connect the regression and structure tracks mechanistically.</p></div>
+ </div>
+</section>
+
+</main>
+<footer class="wrap">Biology and assay design synthesised from the OpenADMET challenge announcement, launch, and midway posts; dataset figures computed from the five released files. Instrument-console theme, paired with the route-map report.</footer>
+</body></html>
